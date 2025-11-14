@@ -1,31 +1,22 @@
-import google.generativeai as genai
-from django.conf import settings
-from dotenv import load_dotenv
 import os
+import json
+import google.generativeai as genai
 
-load_dotenv()
-
+# Lấy API key từ env do Render cung cấp
 GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY")
 
-# Cấu hình API key
+if not GOOGLE_API_KEY:
+    # Lỗi rõ ràng, dễ debug trên log Render
+    raise RuntimeError("GOOGLE_API_KEY is not set. Please add it to Render Environment.")
+
 genai.configure(api_key=GOOGLE_API_KEY)
 
+
 def build_prompt(ingredients, cooking_method=None, cuisine=None):
-    """
-    Tạo prompt tiếng Việt, có thể chọn cách nấu + vùng miền / quốc gia.
-    """
     ing_text = ", ".join(ingredients)
 
-    method_text = (
-        f"Ưu tiên cách nấu: {cooking_method}. "
-        if cooking_method
-        else ""
-    )
-    cuisine_text = (
-        f"Ưu tiên món ăn thuộc ẩm thực: {cuisine}. "
-        if cuisine
-        else ""
-    )
+    method_text = f"Ưu tiên cách nấu: {cooking_method}. " if cooking_method else ""
+    cuisine_text = f"Ưu tiên món ăn thuộc ẩm thực: {cuisine}. " if cuisine else ""
 
     prompt = f"""
 Bạn là một đầu bếp chuyên nghiệp. Hãy tạo một món ăn từ các nguyên liệu sau: {ing_text}.
@@ -52,39 +43,39 @@ Hãy trả kết quả ở dạng JSON với cấu trúc:
     "Bước 2 ..."
   ],
   "cuisine": "Tên vùng miền / quốc gia (nếu có)",
-  "cooking_method": "Kiểu nấu chính (chiên/xào/nướng/hấp/luộc/...",
+  "cooking_method": "Kiểu nấu chính (chiên/xào/nướng/hấp/luộc/...)",
   "tips": "Một vài mẹo nhỏ hoặc gợi ý trình bày"
 }}
 
 Chỉ trả về JSON, không thêm giải thích bên ngoài.
     """
-    return prompt
+    return prompt.strip()
 
 
 def generate_recipe_from_genai(ingredients, cooking_method=None, cuisine=None):
-    """
-    Gọi Gemini để tạo recipe và parse về dạng dict Python.
-    """
     prompt = build_prompt(ingredients, cooking_method, cuisine)
 
-    model = genai.GenerativeModel("gemini-2.0-flash")  # hoặc model khác bạn dùng
-    response = model.generate_content(prompt)
-
-    text = response.text.strip()
-
-    # Thử parse JSON
-    import json
+    # Dùng model ổn định để test
+    model = genai.GenerativeModel("gemini-1.5-flash")
 
     try:
-        data = json.loads(text)
+        response = model.generate_content(prompt)
+    except Exception as e:
+        # Log chi tiết ra console để xem trên Render logs
+        print("GENAI CALL ERROR:", repr(e))
+        raise
+
+    text = (response.text or "").strip()
+    print("GENAI RAW TEXT:", text[:500])  # log 500 ký tự đầu
+
+    try:
+        return json.loads(text)
     except json.JSONDecodeError:
-        # Trường hợp model trả thêm text ngoài JSON → cố gắng cắt phần JSON
         start = text.find("{")
         end = text.rfind("}")
         if start != -1 and end != -1:
             json_str = text[start : end + 1]
-            data = json.loads(json_str)
-        else:
-            raise ValueError("Không parse được JSON từ GenAI response")
+            return json.loads(json_str)
 
-    return data
+        # Nếu tới đây vẫn fail → raise lỗi rõ ràng
+        raise ValueError("Không parse được JSON từ GenAI response")

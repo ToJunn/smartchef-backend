@@ -1,9 +1,14 @@
 import google.generativeai as genai
 from django.conf import settings
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY")
 
 # Cấu hình API key
-genai.configure(api_key=settings.GOOGLE_API_KEY)
-
+genai.configure(api_key=GOOGLE_API_KEY)
 
 def build_prompt(ingredients, cooking_method=None, cuisine=None):
     """
@@ -62,7 +67,7 @@ def generate_recipe_from_genai(ingredients, cooking_method=None, cuisine=None):
     """
     prompt = build_prompt(ingredients, cooking_method, cuisine)
 
-    model = genai.GenerativeModel("gemini-1.5-flash")  # hoặc model khác bạn dùng
+    model = genai.GenerativeModel("gemini-2.0-flash")  # hoặc model khác bạn dùng
     response = model.generate_content(prompt)
 
     text = response.text.strip()

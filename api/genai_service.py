@@ -69,7 +69,7 @@ def generate_recipe(
     prompt = build_prompt(ingredients, cooking_method, cuisine)
 
     # Dùng model ổn định để test
-    model = genai.GenerativeModel("gemini-1.5-flash")
+    model = genai.GenerativeModel("gemini-2.0-flash")
 
     try:
         response = model.generate_content(prompt)

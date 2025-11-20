@@ -4,7 +4,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from .views import RegisterView, me_view, RecipeViewSet, favorite_view ,generate_recipe_view
 
 router = DefaultRouter()
-router.register("recipes", RecipeViewSet, basename="recipe")
+router.register("recipes", RecipeViewSet, basename="recipes")
 
 urlpatterns = [
     # Auth

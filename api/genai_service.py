@@ -12,7 +12,6 @@ GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY")
 
 genai.configure(api_key=GOOGLE_API_KEY)
 
-
 def build_prompt(
     ingredients: List[str],
     cooking_method: Optional[str] = None,
@@ -34,6 +33,7 @@ Yêu cầu:
 - Danh sách nguyên liệu chi tiết (có định lượng ước lượng).
 - Các bước nấu ăn rõ ràng, đánh số bước.
 - Gợi ý cách trình bày món ăn và ăn kèm.
+- Thông tin dinh dưỡng ước tính cho 1 khẩu phần (calo, protein, carbs, chất béo).
 
 Hãy trả kết quả ở dạng JSON với cấu trúc:
 {{
@@ -49,7 +49,13 @@ Hãy trả kết quả ở dạng JSON với cấu trúc:
   ],
   "cuisine": "Tên vùng miền / quốc gia (nếu có)",
   "cooking_method": "Kiểu nấu chính (chiên/xào/nướng/hấp/luộc/...)",
-  "tips": "Một vài mẹo nhỏ hoặc gợi ý trình bày"
+  "tips": "Một vài mẹo nhỏ hoặc gợi ý trình bày",
+  "nutrition": {{
+    "calories": "xxx kcal (ước tính cho 1 khẩu phần)",
+    "protein": "x g",
+    "carbs": "x g",
+    "fat": "x g"
+  }}
 }}
 
 Chỉ trả về JSON, không thêm giải thích bên ngoài.

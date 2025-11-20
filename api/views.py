@@ -21,7 +21,7 @@ from .serializers import (
     FavoriteSerializer,
     GenerateRecipeInputSerializer,
 )
-from .genai_service import generate_recipe_from_genai
+from .genai_service import generate_recipe
 
 
 # ==========================
@@ -242,7 +242,7 @@ def generate_recipe_view(request):
 
     # Gọi Gemini
     try:
-        gen_data = generate_recipe_from_genai(
+        gen_data = generate_recipe(
             ingredients,
             cooking_method=cooking_method,
             cuisine=cuisine,

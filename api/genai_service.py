@@ -1,5 +1,8 @@
+# api/genai_service.py
 import os
 import json
+from typing import List, Optional, Dict, Any
+
 import google.generativeai as genai
 
 # Lấy API key từ env do Render cung cấp
@@ -12,7 +15,11 @@ if not GOOGLE_API_KEY:
 genai.configure(api_key=GOOGLE_API_KEY)
 
 
-def build_prompt(ingredients, cooking_method=None, cuisine=None):
+def build_prompt(
+    ingredients: List[str],
+    cooking_method: Optional[str] = None,
+    cuisine: Optional[str] = None,
+) -> str:
     ing_text = ", ".join(ingredients)
 
     method_text = f"Ưu tiên cách nấu: {cooking_method}. " if cooking_method else ""
@@ -52,7 +59,15 @@ Chỉ trả về JSON, không thêm giải thích bên ngoài.
     return prompt.strip()
 
 
-def generate_recipe(ingredients, cooking_method=None, cuisine=None):
+def generate_recipe(
+    ingredients: List[str],
+    cooking_method: Optional[str] = None,
+    cuisine: Optional[str] = None,
+) -> Dict[str, Any]:
+    """
+    Gọi Gemini để sinh công thức món ăn.
+    Trả về dict JSON đã parse sẵn.
+    """
     prompt = build_prompt(ingredients, cooking_method, cuisine)
 
     # Dùng model ổn định để test
@@ -65,12 +80,14 @@ def generate_recipe(ingredients, cooking_method=None, cuisine=None):
         print("GENAI CALL ERROR:", repr(e))
         raise
 
-    text = (response.text or "").strip()
+    text = (getattr(response, "text", "") or "").strip()
     print("GENAI RAW TEXT:", text[:500])  # log 500 ký tự đầu
 
+    # Thử parse trực tiếp
     try:
         return json.loads(text)
     except json.JSONDecodeError:
+        # Fallback: cắt từ dấu { ... } cuối cùng
         start = text.find("{")
         end = text.rfind("}")
         if start != -1 and end != -1:

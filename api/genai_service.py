@@ -52,7 +52,7 @@ Chỉ trả về JSON, không thêm giải thích bên ngoài.
     return prompt.strip()
 
 
-def generate_recipe_from_genai(ingredients, cooking_method=None, cuisine=None):
+def generate_recipe(ingredients, cooking_method=None, cuisine=None):
     prompt = build_prompt(ingredients, cooking_method, cuisine)
 
     # Dùng model ổn định để test

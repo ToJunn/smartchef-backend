@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from .views import RegisterView, me_view, RecipeViewSet, favorite_view ,generate_recipe_view
+from .views import RegisterView, me_view, RecipeViewSet, favorite_view ,generate_recipe
 
 router = DefaultRouter()
 router.register("recipes", RecipeViewSet, basename="recipe")
@@ -18,6 +18,6 @@ urlpatterns = [
     path("favorites/", favorite_view, name="favorites"),
 
     # GenAI generate recipe
-    path("recipes/generate/", generate_recipe_view, name="generate_recipe"),
+    path('recipes/generate/', generate_recipe, name='recipe-generate'),
 ]
 

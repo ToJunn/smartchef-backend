@@ -13,11 +13,11 @@ urlpatterns = [
     path("auth/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("auth/me/", me_view, name="me"),
 
-    # Recipes & Favorites
-    path("", include(router.urls)),
-    path("favorites/", favorite_view, name="favorites"),
-
     # GenAI generate recipe
     path("recipes/generate/", generate_recipe_view, name="recipe-generate"),
-]
 
+    # Recipes & Favorites
+    path("", include(router.urls)), 
+    path("favorites/", favorite_view, name="favorites"),
+
+]

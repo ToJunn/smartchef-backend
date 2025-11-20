@@ -2,15 +2,13 @@
 import os
 import json
 from typing import List, Optional, Dict, Any
-
 import google.generativeai as genai
 
 # Lấy API key từ env do Render cung cấp
 GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY")
 
-if not GOOGLE_API_KEY:
-    # Lỗi rõ ràng, dễ debug trên log Render
-    raise RuntimeError("GOOGLE_API_KEY is not set. Please add it to Render Environment.")
+# if not GOOGLE_API_KEY:
+#     GOOGLE_API_KEY = 
 
 genai.configure(api_key=GOOGLE_API_KEY)
 

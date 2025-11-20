@@ -222,7 +222,7 @@ def favorite_view(request):
     ),
 )
 @api_view(["POST"])
-@permission_classes([permissions.IsAuthenticated])  # đổi thành AllowAny nếu muốn public
+@permission_classes([permissions.AllowAny])  # đổi thành AllowAny nếu muốn public, IsAuthenticated
 def generate_recipe_view(request):
     """
     Body mẫu:
